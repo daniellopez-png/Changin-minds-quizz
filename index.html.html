@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CHANGING MINDS - Quiz Desigualdad de Género</title>
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    height: 100vh;
+    background: linear-gradient(to right, #4a90e2 50%, #ff8ec7 50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .container {
+    background: white;
+    width: 80%;
+    max-width: 600px;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    text-align: center;
+  }
+  h1 { margin-bottom: 5px; }
+  .hidden { display: none; }
+  .input-box {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 8px;
+    border: 1px solid #aaa;
+  }
+  button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 18px;
+    background: #4a90e2;
+    border: none;
+    color: white;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  button:hover { background: #3b7ac0; }
+  .options button {
+    width: 100%;
+    margin: 8px 0;
+    background: #ff8ec7;
+  }
+  .options button:hover {
+    background: #e96dac;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div id="start-screen">
+    <h1>CHANGING MINDS</h1>
+    <h3>Chicas y chicos: mismos sueños, mismos derechos</h3>
+    <p>¡Bienvenidos al Quiz sobre Desigualdad de Género!<br><br>
+    Este cuestionario busca ayudarnos a reflexionar sobre cómo se vive la igualdad entre hombres y mujeres en nuestra sociedad.<br><br>
+    ¡Participa y demuestra cuánto sabes! 💪✨</p>
+    <button onclick="startQuiz()">Empezar</button>
+  </div>
+
+  <div id="quiz" class="hidden">
+    <h2 id="question"></h2>
+    <textarea id="answerBox" class="input-box hidden" placeholder="Escribe tu respuesta aquí..."></textarea>
+    <div id="options" class="options"></div>
+    <button id="nextBtn" onclick="nextQuestion()">Siguiente pregunta</button>
+  </div>
+
+  <div id="result-screen" class="hidden">
+    <h2>¡Gracias por participar! 🙌</h2>
+    <p id="scoreText"></p>
+    <p>La desigualdad de género es un problema real que afecta a millones de personas en el mundo.<br><br>
+    Recordemos que la igualdad comienza con nuestras acciones diarias:<br>
+    respetar, escuchar, apoyar y tratar a todos por igual.<br><br>
+    Cada pequeña acción puede generar un gran cambio. 💜<br>
+    ¡Sigue aprendiendo, cuestionando y defendiendo la igualdad!</p>
+  </div>
+</div>
+
+<script>
+const openQuestions = [
+  "¿Qué significa para ti la desigualdad de género?",
+  "¿De qué maneras crees que la desigualdad de género afecta a las personas en tu comunidad o país?",
+  "¿Por qué piensas que aún existen diferencias entre hombres y mujeres en ciertos trabajos o profesiones?",
+  "¿Qué ejemplos de desigualdad de género puedes observar en la vida cotidiana (en casa, la escuela, los medios, etc.)?",
+  "¿Cómo crees que los estereotipos de género influyen en la forma en que las personas se comportan o toman decisiones?",
+  "¿Qué papel juegan la familia y la educación en la formación de ideas sobre el género?",
+  "¿Qué acciones crees que podrían ayudar a construir una sociedad más igualitaria entre hombres y mujeres?",
+  "¿Consideras que los medios de comunicación contribuyen a reducir o mantener la desigualdad de género? Explica tu respuesta.",
+  "¿Cómo piensas que el lenguaje puede influir en la percepción de igualdad o desigualdad entre géneros?",
+  "¿Qué opinas sobre el papel del feminismo en la lucha por la igualdad de género?"
+];
+
+const mcQuestions = [
+  {
+    q: "¿Qué entiendes por desigualdad de género?",
+    options: [
+      "La diferencia biológica entre hombres y mujeres.",
+      "El trato desigual hacia las personas por su género o identidad.",
+      "Que las mujeres son superiores a los hombres.",
+      "Que ambos géneros son iguales y no hay problema de desigualdad."
+    ],
+    correct: 1
+  },
+  {
+    q: "¿Dónde crees que se nota más la desigualdad de género?",
+    options: [
+      "En el ámbito laboral y los salarios.",
+      "En la educación y las oportunidades de estudio.",
+      "En el hogar y las tareas domésticas.",
+      "En todos los ámbitos anteriores."
+    ],
+    correct: 3
+  },
+  {
+    q: "¿Por qué crees que existe una brecha salarial entre hombres y mujeres?",
+    options: [
+      "Porque las mujeres eligen trabajos peor pagados.",
+      "Porque las empresas aún discriminan a las mujeres.",
+      "Porque los hombres trabajan más horas.",
+      "Porque las mujeres priorizan la familia antes que el trabajo."
+    ],
+    correct: 1
+  },
+  {
+    q: "¿Qué papel juega la educación en la igualdad de género?",
+    options: [
+      "Es fundamental para eliminar estereotipos desde la infancia.",
+      "No tiene mucha influencia, depende más de la cultura.",
+      "Solo sirve para enseñar derechos, no cambia comportamientos.",
+      "No debería incluir temas de género en las escuelas."
+    ],
+    correct: 0
+  },
+  {
+    q: "¿Cómo actuarías si participaras en una protesta contra la desigualdad de género?",
+    options: [
+      "Marcharía de forma pacífica mostrando carteles y apoyo.",
+      "Participaría en la organización del evento y ayudaría a informar a los demás.",
+      "Usaría redes sociales para difundir el mensaje.",
+      "Observaría y apoyaría desde un lugar tranquilo sin involucrarme mucho."
+    ],
+    correct: 0
+  },
+  {
+    q: "¿Qué medidas deberían tomar los gobiernos para reducir la desigualdad de género?",
+    options: [
+      "Promover leyes de igualdad salarial.",
+      "Incentivar la educación con enfoque de género.",
+      "Fomentar campañas de concientización social.",
+      "Todas las anteriores."
+    ],
+    correct: 3
+  },
+  {
+    q: "En la familia, ¿cómo se pueden promover relaciones igualitarias?",
+    options: [
+      "Repartiendo equitativamente las tareas domésticas.",
+      "Enseñando desde pequeños que todos merecen respeto.",
+      "Evitando imponer roles tradicionales.",
+      "Todas las anteriores."
+    ],
+    correct: 3
+  },
+  {
+    q: "¿Qué opinas de las cuotas de género en política o empresas?",
+    options: [
+      "Son necesarias para garantizar igualdad de oportunidades.",
+      "No son necesarias, debería importar solo la capacidad.",
+      "Son útiles solo temporalmente hasta lograr equilibrio.",
+      "No funcionan y generan división."
+    ],
+    correct: 0
+  },
+  {
+    q: "¿De qué manera las redes sociales pueden ayudar a combatir la desigualdad de género?",
+    options: [
+      "Permiten compartir información y crear conciencia.",
+      "No tienen impacto, son solo entretenimiento.",
+      "Sirven solo para criticar famosos.",
+      "Deberían prohibirse para evitar discusiones."
+    ],
+    correct: 0
+  },
+  {
+    q: "¿Cómo actuarías si participaras en una protesta en contra de la desigualdad de género?",
+    options: [
+      "Marcharía pacíficamente con carteles.",
+      "Ayudaría a organizar e informar.",
+      "Usaría redes sociales para difundir.",
+      "Apoyaría desde un lugar tranquilo."
+    ],
+    correct: 1
+  }
+];
+
+let part = 1;
+let index = 0;
+let score = 0;
+
+function startQuiz() {
+  document.getElementById("start-screen").classList.add("hidden");
+  document.getElementById("quiz").classList.remove("hidden");
+  loadQuestion();
+}
+
+function loadQuestion() {
+  const questionEl = document.getElementById("question");
+  const answerBox = document.getElementById("answerBox");
+  const optionsDiv = document.getElementById("options");
+
+  if (part === 1) {
+    questionEl.textContent = openQuestions[index];
+    answerBox.classList.remove("hidden");
+    optionsDiv.innerHTML = "";
+  } else {
+    const q = mcQuestions[index - 10];
+    questionEl.textContent = q.q;
+    answerBox.classList.add("hidden");
+    optionsDiv.innerHTML = "";
+    q.options.forEach((opt, i) => {
+      const btn = document.createElement("button");
+      btn.textContent = opt;
+      btn.onclick = () => {
+        if (i === q.correct) score++;
+        document.querySelectorAll("#options button").forEach(b => b.disabled = true);
+      };
+      optionsDiv.appendChild(btn);
+    });
+  }
+}
+
+function nextQuestion() {
+  const answerBox = document.getElementById("answerBox");
+
+  if (part === 1 && answerBox.value.trim() === "") {
+    alert("Por favor escribe tu respuesta antes de continuar.");
+    return;
+  }
+
+  index++;
+  if (part === 1 && index === 10) {
+    part = 2;
+  }
+
+  if (part === 2 && index === 20) {
+    showResult();
+    return;
+  }
+
+  loadQuestion();
+  if (part === 1) answerBox.value = "";
+}
+
+function showResult() {
+  document.getElementById("quiz").classList.add("hidden");
+  document.getElementById("result-screen").classList.remove("hidden");
+  document.getElementById("scoreText").textContent = "Tu puntaje en la Parte 2 es: " + score + "/10";
+}
+</script>
+
+</body>
+</html>
